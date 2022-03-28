@@ -24,6 +24,7 @@ from typing import Dict, List, Tuple, Union
 from absl import logging
 
 import numpy as np
+import rlds
 import tensorflow as tf
 
 from tf_agents.replay_buffers import reverb_utils
@@ -31,9 +32,6 @@ from tf_agents.specs import tensor_spec
 from tf_agents.trajectories import policy_step
 from tf_agents.trajectories import time_step as ts
 from tf_agents.trajectories import trajectory
-from tf_agents.utils import lazy_loader
-
-rlds = lazy_loader.LazyLoader('rlds', globals(), 'rlds')
 
 
 def get_rlds_step_features() -> List[str]:
@@ -77,7 +75,7 @@ def _validate_rlds_step_spec(
     ValueError: If RLDS step spec is not valid.
   """
   rlds_step_features = get_rlds_step_features()
-  if not all(item in rlds_step_features for item in rlds_step_spec):
+  if not all(item in rlds_step_spec for item in rlds_step_features):
     raise ValueError(
         'Invalid RLDS step spec. Features expected '
         f'are {rlds_step_features}, but found {list(rlds_step_spec.keys())}')
