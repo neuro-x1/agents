@@ -51,10 +51,6 @@ class RNNWrapper(tf.keras.layers.Layer):
       raise NotImplementedError(
           'Provided a Keras RNN layer with return_state==False. '
           'This configuration is not supported.  Layer: {}'.format(layer))
-    if not layer_config.get('return_sequences', False):
-      raise NotImplementedError(
-          'Provided a Keras RNN layer with return_sequences==False. '
-          'This configuration is not supported.  Layer: {}'.format(layer))
 
     self._layer = layer
     super(RNNWrapper, self).__init__(**kwargs)
