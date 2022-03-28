@@ -179,7 +179,8 @@ class RNNWrapper(tf.keras.layers.Layer):
     new_state = tf.nest.pack_sequence_as(
         self.state_size, tf.nest.flatten(new_state))
 
-    if not has_time_axis:
+    # Remove time axis if not in input and return_sequences=True
+    if (not has_time_axis) and self._layer.return_sequences:
       output = tf.nest.map_structure(lambda t: tf.squeeze(t, axis=1), output)
 
     # Outputs are in output, and state is in outputs[1:]
