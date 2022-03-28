@@ -74,6 +74,24 @@ class RNNWrapperTest(test_utils.TestCase):
     self.assertAllClose(outputs, outputs_manual_state)
     self.assertAllClose(next_state, next_state_time_dim)
     self.assertAllClose(next_state, next_state_manual_state)
+    
+    # Make sure wrapper call works when return_sequences=False.
+    wrapper = rnn_wrapper.RNNWrapper(
+        tf.keras.layers.LSTM(3, return_state=True, return_sequences=False))
+    
+    time_steps = 4
+    inputs_with_time = np.random.rand(batch_size, time_steps, input_depth)
+    inputs_with_time.astype(np.float32)
+    
+    outputs, next_state = wrapper(inputs)
+    outputs_with_time, next_state_with_time = wrapper(inputs_with_time)
+    
+    for out_variant in (outputs, outputs_with_time):
+      self.assertEqual(outputs.shape, (batch_size, 3))
+    for state_variant in (next_state, next_state_with_time):
+      self.assertLen(state_variant, 2)
+      self.assertEqual(state_variant[0].shape, (batch_size, 3))
+      self.assertEqual(state_variant[1].shape, (batch_size, 3))
 
   def testCopy(self):
     wrapper = rnn_wrapper.RNNWrapper(
@@ -86,10 +104,6 @@ class RNNWrapperTest(test_utils.TestCase):
     with self.assertRaisesRegex(NotImplementedError,
                                 'with return_state==False'):
       rnn_wrapper.RNNWrapper(tf.keras.layers.LSTM(3, return_sequences=True))
-
-    with self.assertRaisesRegex(NotImplementedError,
-                                'with return_sequences==False'):
-      rnn_wrapper.RNNWrapper(tf.keras.layers.LSTM(3, return_state=True))
 
 
 if __name__ == '__main__':
